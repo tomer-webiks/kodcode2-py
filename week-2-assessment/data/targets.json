@@ -1,0 +1,30 @@
+[
+    {
+        "city": "Damascus",
+        "priority": 5
+    },
+    {
+        "city": "Beirut",
+        "priority": 4
+    },
+    {
+        "city": "Amman",
+        "priority": 3
+    },
+    {
+        "city": "Tehran",
+        "priority": 4
+    },
+    {
+        "city": "Baghdad",
+        "priority": 5
+    },
+    {
+        "city": "Gaza",
+        "priority": 5
+    },
+    {
+        "city": "Cairo",
+        "priority": 3
+    }
+]

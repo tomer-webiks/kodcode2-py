@@ -1,9 +1,11 @@
 import csv
 import json
-from mission import Mission
-from aircraft import Aircraft
-from pilot import Pilot
-from target import Target
+import os
+import math
+from models.aircraft import Aircraft
+from models.pilot import Pilot
+from models.target import Target
+from weather import get_lat_lon, get_weather, haversine_distance
 
 
 def save_to_csv(missions, file_name):
@@ -19,20 +21,59 @@ def save_to_csv(missions, file_name):
         print(f"Error saving to CSV: {e}")
 
 
-def load_air_strikes_from_json(file_name):
+def load_entities():
     try:
-        with open(file_name, 'r') as file:
+        entities = dict()
+        base_path = os.path.dirname(__file__)
+        with open(os.path.join(base_path, 'data', 'aircrafts.json'), 'r') as file:
             data = json.load(file)
-            missions = []
+            entities['aircrafts'] = []
+
             for entry in data:
-                aircraft = Aircraft(entry["aircraft_type"], 100, 800)  # נתוני מטוס לדוגמה
-                pilot = Pilot(entry["pilot_name"], entry["pilot_skill"])
-                target = Target(entry["target_type"], entry["target_defense"])
-                weather = entry["weather"]  # שימוש במזג אוויר מתוך הקובץ
-                mission = Mission(aircraft, pilot, target, weather)
-                mission.simulate()
-                missions.append(mission)
-            return missions
+                aircraft = Aircraft(entry["type"], entry["fuel_capacity"], entry["speed"])  # נתוני מטוס לדוגמה
+                entities['aircrafts'].append(aircraft)
+
+        with open(os.path.join(base_path, 'data', 'pilots.json'), 'r') as file:
+            data = json.load(file)
+            entities['pilots'] = []
+
+            for entry in data:
+                pilot = Pilot(entry["name"], entry["skill"])  # נתוני מטוס לדוגמה
+                entities['pilots'].append(pilot)
+
+        with open(os.path.join(base_path, 'data', 'targets.json'), 'r') as file:
+            data = json.load(file)
+            entities['targets'] = []
+            entities['targets_max_values'] = dict()
+
+            # 0. Get lon/lat for Haifa
+            (origin_lon, origin_lat) = get_lat_lon("Haifa")
+
+            for index, entry in enumerate(data):
+                city = entry["city"]
+
+                # 1. Make API call to get Lon and Lat
+                (target_lon, target_lat) = get_lat_lon(city)
+
+                # 2. Calculate distance between Haifa and target
+                distance_km = haversine_distance(origin_lon, origin_lat, target_lon, target_lat)
+                print(f"- Called Weather API for {city}, received {target_lon}, {target_lat}.")
+
+                # 3. Make API call to get weather forecast
+                (forecast, wind_speed, cloud_density) = get_weather(city)
+
+                # Finally create the object and populate with all information
+                target = Target(entry["city"], entry["priority"], distance_km, forecast, wind_speed, cloud_density)  # נתוני מטוס לדוגמה
+                entities['targets'].append(target)
+
+                # 4. Save max values for scoring
+                if (index == 0 or entities['targets'][index].priority > entities['targets_max_values']['priority']):
+                    entities['targets_max_values']['priority'] = entities['targets'][index].priority
+
+                if (index == 0 or entities['targets'][index].wind_speed > entities['targets_max_values']['wind_speed']):
+                    entities['targets_max_values']['wind_speed'] = entities['targets'][index].wind_speed
+
+        return entities
     except Exception as e:
         print(f"Error loading JSON: {e}")
         return []

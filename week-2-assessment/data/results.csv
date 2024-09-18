@@ -1,0 +1,11 @@
+Aircraft Type,Pilot Name,Pilot Skill,Target Type,Target Defense,Weather,Result
+Fighter Jet,John Doe,8,Enemy Base,20,Clear,Success
+Bomber,Jane Smith,6,Radar Station,15,Windy,Failure
+Drone,Michael Clark,9,Convoy,10,Stormy,Failure
+Helicopter,Alice Johnson,7,Supply Depot,12,Clear,Failure
+Fighter Jet,Robert White,10,Armored Division,25,Clear,Success
+Bomber,Samantha Brown,5,Command Center,18,Windy,Failure
+Fighter Jet,Tom Cruise,8,Enemy Camp,17,Stormy,Failure
+Drone,Chris Pratt,7,Radar Station,16,Clear,Failure
+Helicopter,David Miller,6,Supply Depot,11,Windy,Failure
+Bomber,Sarah Connor,9,Enemy Headquarters,22,Clear,Success
